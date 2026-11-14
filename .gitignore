@@ -2,6 +2,9 @@
 .env
 *.env
 .env.local
+*.pem
+*.key
+*.cert
 
 # SQLite Databases & logs
 *.db
