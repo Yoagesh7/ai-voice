@@ -143,6 +143,19 @@ class NativeWavRecorder {
       offset += this.pcmBuffers[i].length;
     }
 
+    // Audio Peak Normalization for mobile mic clarity
+    let maxPeak = 0;
+    for (let i = 0; i < merged.length; i++) {
+      const abs = Math.abs(merged[i]);
+      if (abs > maxPeak) maxPeak = abs;
+    }
+    if (maxPeak > 0.03 && maxPeak < 0.85) {
+      const gain = Math.min(3.5, 0.88 / maxPeak);
+      for (let i = 0; i < merged.length; i++) {
+        merged[i] = Math.max(-1, Math.min(1, merged[i] * gain));
+      }
+    }
+
     const targetRate = 16000;
     const downsampled = this.downsample(merged, this.sampleRate, targetRate);
     const wavBytes = this.encodeWAV(downsampled, targetRate);
@@ -387,6 +400,9 @@ function setupSpeechRecognition() {
 // =================== Call Lifecycle ===================
 async function startCall() {
   try {
+    const layout = document.querySelector('.app-layout');
+    if (layout) layout.classList.add('in-call-fullscreen');
+
     callStatusText.textContent = 'Connecting...';
     activeDot.classList.add('live');
     stageContainer.classList.add('in-call');
@@ -506,6 +522,7 @@ async function processRecordedAudio(wavBlob) {
   try {
     const formData = new FormData();
     formData.append('file', wavBlob, 'user_speech.wav');
+    formData.append('language_code', currentProfile.preferred_language === 'english' ? 'en-IN' : 'ta-IN');
 
     const sttRes = await fetch('/api/stt', {
       method: 'POST',
@@ -620,6 +637,9 @@ async function endCall() {
 }
 
 function resetCallUI() {
+  const layout = document.querySelector('.app-layout');
+  if (layout) layout.classList.remove('in-call-fullscreen');
+
   isCallActive = false;
   currentCallId = null;
   standbyControls.style.display = 'flex';

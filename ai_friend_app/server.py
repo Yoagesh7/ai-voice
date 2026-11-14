@@ -99,20 +99,20 @@ async def api_start_call():
     # Generate persona-appropriate warm initial greeting audio
     if friend_name.lower() in ["shanthi", "roopa"]:
         if lang == "tamil":
-            greeting = f"வணக்கம் பா, சாந்தி பேசுறேன். நல்லா ஓய்வா உட்காருங்க... சொல்லுங்க, எப்படி இருக்கீங்க?"
+            greeting = f"வணக்கம் பா, சாந்தி பேசுறேன். நல்லா ஓய்வா உட்காருங்க... இன்னிக்கு நாள் எப்படி போச்சு? என்ன ஆச்சு?"
         elif lang == "english":
-            greeting = f"Hello dear, Shanthi here. Take a gentle breath, relax... how was your day?"
+            greeting = f"Hello dear, Shanthi here. Take a gentle breath, relax... how was your day today? Tell me everything!"
         else: # Tanglish
-            greeting = f"Vanakkam pa, Shanthi pesuren. Nalla relax ah ukkanthu sollu... how was your day?"
+            greeting = f"Vanakkam pa, Shanthi pesuren! Nalla relax ah ukkanthu sollu... how was your day? Enna aachu inniku?"
     elif friend_name.lower() in ["anand", "ratan"]:
-        greeting = f"Vanakkam pa, Anand pesuren. Relax panniko, sollu enna vishayam?"
+        greeting = f"Vanakkam pa, Anand pesuren. Relax panniko, sollu enna vishayam? What happened today?"
     else:
         if lang == "tamil":
-            greeting = f"ஹலோ! சொல்லுங்க, எப்படி இருக்கீங்க? நான் {friend_name}."
+            greeting = f"ஹலோ! நான் {friend_name} பேசுறேன். இன்னிக்கு நாள் எப்படி போச்சு? என்ன விசேஷம்?"
         elif lang == "english":
-            greeting = f"Hey! So good to hear from you. How was your day?"
+            greeting = f"Hey! {friend_name} here. So good to hear from you! How was your day today?"
         else: # Tanglish
-            greeting = f"Hey da! {friend_name} here. Solra, how was your day today?"
+            greeting = f"Hey da! {friend_name} here. Solra, how was your day today? Enna aachu?"
 
     audio_b64 = await text_to_speech(greeting, speaker=voice, language_code="ta-IN")
     save_message("ai", greeting, audio_base64=audio_b64, call_id=call_id)
@@ -163,9 +163,17 @@ async def api_chat(req: ChatRequest):
     }
 
 @app.post("/api/stt")
-async def api_stt(file: UploadFile = File(...)):
+async def api_stt(file: UploadFile = File(...), language_code: Optional[str] = Form(None)):
     audio_bytes = await file.read()
-    transcript = await speech_to_text(audio_bytes, filename=file.filename or "recording.wav")
+    profile = get_profile()
+    pref_lang = (profile.get("preferred_language") or "tanglish").lower()
+    
+    # In Sarvam saaras:v3, 'ta-IN' delivers superior accuracy for both Tamil and code-switched Tanglish!
+    target_lang = "ta-IN" if pref_lang in ["tamil", "tanglish"] else "en-IN"
+    if language_code:
+        target_lang = language_code
+        
+    transcript = await speech_to_text(audio_bytes, filename=file.filename or "recording.wav", language_code=target_lang)
     return {"transcript": transcript}
 
 @app.post("/api/call/end")

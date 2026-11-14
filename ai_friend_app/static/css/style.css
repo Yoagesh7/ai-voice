@@ -173,6 +173,78 @@ body {
   text-transform: uppercase;
 }
 
+/* ================= FULL-PAGE PHONE CALL VIEW (Mobile & Desktop) ================= */
+.app-layout.in-call-fullscreen .app-header {
+  display: none !important;
+}
+
+.app-layout.in-call-fullscreen .sidebar-container {
+  display: none !important;
+}
+
+.app-layout.in-call-fullscreen .workspace-grid {
+  grid-template-columns: 1fr !important;
+  min-height: 100vh !important;
+}
+
+.app-layout.in-call-fullscreen .stage-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  padding: max(20px, env(safe-area-inset-top)) 24px max(28px, env(safe-area-inset-bottom)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  background: radial-gradient(circle at 50% 20%, #171d2b 0%, #07090e 85%) !important;
+  border: none !important;
+}
+
+.app-layout.in-call-fullscreen .caller-avatar-card {
+  margin-bottom: 16px;
+}
+
+.app-layout.in-call-fullscreen .caller-initial {
+  width: 88px;
+  height: 88px;
+  font-size: 2.2rem;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.app-layout.in-call-fullscreen .caption-card {
+  max-width: 100%;
+  background: rgba(16, 19, 27, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-layout.in-call-fullscreen .connected-actions {
+  gap: 20px;
+}
+
+.app-layout.in-call-fullscreen .tactile-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--r-full);
+}
+
+.app-layout.in-call-fullscreen .tactile-btn.end-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-full);
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.4);
+}
+
+.app-layout.in-call-fullscreen .talk-pill-btn {
+  height: 54px;
+  padding: 0 28px;
+  border-radius: var(--r-full);
+  font-size: 0.95rem;
+}
+
 /* ================= Workspace Grid ================= */
 .workspace-grid {
   flex: 1;
@@ -184,6 +256,20 @@ body {
 @media (max-width: 860px) {
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+  .stage-container {
+    padding: 20px 16px;
+    min-height: calc(100vh - 56px);
+  }
+  .header-nav {
+    padding: 2px;
+  }
+  .nav-btn {
+    padding: 6px 8px;
+    font-size: 0.75rem;
+  }
+  .nav-btn span {
+    font-size: 0.75rem;
   }
   .sidebar-container {
     display: none; /* Controlled by tab buttons on mobile */

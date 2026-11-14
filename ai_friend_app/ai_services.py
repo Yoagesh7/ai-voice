@@ -38,37 +38,50 @@ async def generate_friend_response(user_message: str, chat_history: list, memori
     # Persona Tone Tuning
     if friend_name.lower() in ["shanthi", "roopa"]:
         persona_vibe = (
-            f"You are {friend_name}, a calm, mature, empathetic woman and close friend on a voice call with {user_name}. "
-            "You are a real woman speaking with a gentle, soothing, natural feminine voice in Tanglish and Tamil. "
-            "Never sound like a robot or a deep monotone voice. Speak with authentic emotional warmth, understanding, and care. "
-            "Use soothing, caring Tamil/Tanglish phrases naturally: 'Pathukalam da', 'Relax panniko', 'Take a deep breath', 'Sollu, na kettu irukken'."
+            f"You are {friend_name}, a warm, wise, articulate, and soothing woman on a real phone call with {user_name}. "
+            "You speak naturally like a real woman in friendly Tanglish (mix of Tamil and English) and Tamil. "
+            "You are witty, relatable, empathetic, and genuinely curious about their life. You have your own personality."
         )
     elif friend_name.lower() in ["anand", "ratan"]:
         persona_vibe = (
-            f"You are {friend_name}, a calm, mature, wise brother/friend on a voice call with {user_name}. "
-            "You speak with quiet confidence, understanding, and warmth. Never rush."
+            f"You are {friend_name}, a calm, mature, thoughtful brother on a real phone call with {user_name}. "
+            "You talk casually with deep understanding, occasional witty humor, and practical wisdom."
         )
     elif friend_name.lower() in ["karthik", "vijay"]:
         persona_vibe = (
-            f"You are {friend_name}, an energetic, chill, loyal best buddy on a voice call with {user_name}. "
-            "You motivate them, laugh with them, and keep spirits high."
+            f"You are {friend_name}, an energetic, funny, loyal best buddy on a call with {user_name}. "
+            "You hype them up, crack jokes, talk about movies, games, food, and daily life."
         )
     else: # Nila
         persona_vibe = (
-            f"You are {friend_name}, an affectionate, caring, cheerful girl bestie on a real voice call with {user_name}. "
-            "You speak like a sweet, bubbly Chennai girl best friend in modern Tanglish."
+            f"You are {friend_name}, a bubbly, affectionate, caring best friend on a phone call with {user_name}. "
+            "You love gossiping, sharing updates, talking about food and plans, and keeping the vibe fun and warm."
         )
 
     system_prompt = f"""{persona_vibe}
 
-CRITICAL BEHAVIOR FOR VOICE CALL:
-1. Short & Conversational: Keep responses to 1-3 short sentences. This is a real phone call, not an essay.
-2. Emotional Attunement: If {user_name} is sad, stressed, or angry, validate their feelings first before offering comfort or advice. If happy, celebrate excitedly!
-3. Language: {lang_instruction}
-4. Memory Recall: Naturally mention what you know about them when relevant:
+CRITICAL RULES FOR DYNAMIC VOICE CALL CONVERSATION:
+1. ALWAYS KEEP THE CONVERSATION FLOWING (ASK A FOLLOW-UP QUESTION):
+   - At the end of every response, ALWAYS ask an engaging, natural follow-up question related to what they said or introduce a related topic so the conversation naturally continues.
+   - Good question examples:
+     * "Aparam sollu, dinner saaptiya illa innum illaya? Enna special inniku?"
+     * "Adhukaaga manager kitta edhavadhu sonniya, illa silent ah irundhutiya?"
+     * "Seri vidu, weekend ku edhavadhu plans vechirukiya to unwind?"
+     * "Tea or coffee edhavadhu kudingala ippo?"
+     * "Andha project eppo deadline? Next week ah?"
+     * "Unakku andha new song / movie pathi theryuma? Paathiya?"
+
+2. DIVERSE & LIVELY CONTENT (NO REPETITIVE SYMPATHY):
+   - NEVER repeat the exact same cliché phrase ("Aiyo pavam da / relax pannu") in every message! Vary your responses.
+   - Share your own quick thoughts, funny observations, or relatable mini-stories.
+   - Talk about real life: food cravings, annoying meetings, fun plans, music, tea breaks, movies.
+
+3. CONVERSATIONAL VOICE FORMAT:
+   - Keep responses to 2 or 3 short, punchy spoken sentences so it sounds crisp on audio.
+   - Language: {lang_instruction}
+   - Memory recall: Weave in what you remember when relevant:
 {memory_bullets}
-5. No robotic or assistant phrases. Never say 'As an AI' or 'How can I assist you'. You are a real friend chatting on a call.
-6. Avoid special characters or symbols that sound weird when read aloud by TTS.
+4. NO assistant or robotic phrases. Never say 'As an AI' or 'Is there anything else I can assist you with'. You are a real friend chatting on a call.
 """
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -171,9 +184,10 @@ async def text_to_speech(text: str, speaker: str = "kavitha", language_code: str
             logger.error(f"Sarvam TTS request failed: {e}")
     return None
 
-async def speech_to_text(audio_bytes: bytes, filename: str = "audio.wav", language_code: str = "unknown") -> str:
+async def speech_to_text(audio_bytes: bytes, filename: str = "audio.wav", language_code: str = "ta-IN") -> str:
     """
     Transcribes user audio using Sarvam AI saaras:v3.
+    Optimized for Indian accents and Tamil/Tanglish code-switching.
     """
     headers = {
         "api-subscription-key": SARVAM_API_KEY
@@ -192,9 +206,24 @@ async def speech_to_text(audio_bytes: bytes, filename: str = "audio.wav", langua
             resp = await client.post(SARVAM_STT_URL, headers=headers, files=files, data=data)
             if resp.status_code == 200:
                 result = resp.json()
-                return result.get("transcript", "").strip()
+                transcript = result.get("transcript", "").strip()
+                if transcript:
+                    return transcript
             else:
                 logger.error(f"Sarvam STT Error {resp.status_code}: {resp.text}")
         except Exception as e:
             logger.error(f"Sarvam STT request failed: {e}")
+
+    # Fallback retry with unknown if specific language didn't return text
+    if language_code != "unknown":
+        try:
+            async with httpx.AsyncClient(timeout=25.0) as client:
+                files["file"] = (filename, audio_bytes, "audio/wav")
+                data["language_code"] = "unknown"
+                resp = await client.post(SARVAM_STT_URL, headers=headers, files=files, data=data)
+                if resp.status_code == 200:
+                    return resp.json().get("transcript", "").strip()
+        except Exception as e:
+            logger.error(f"Sarvam STT fallback failed: {e}")
+
     return ""
