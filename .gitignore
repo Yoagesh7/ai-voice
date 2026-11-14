@@ -1,0 +1,21 @@
+# Environment variables with private API keys
+.env
+*.env
+.env.local
+
+# SQLite Databases & logs
+*.db
+*.sqlite3
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

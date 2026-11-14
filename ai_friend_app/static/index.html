@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Nila - Your AI Friend (Tamil & Tanglish Voice Call)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- Top Navigation Tabs -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="status-dot online"></div>
+        <span class="brand-title">AI Bestie</span>
+        <span class="badge lang-badge" id="currentLangBadge">Tanglish</span>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="call-tab">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z"/></svg>
+          <span>Call</span>
+        </button>
+        <button class="tab-btn" data-tab="chat-tab">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+          <span>Chat</span>
+        </button>
+        <button class="tab-btn" data-tab="memory-tab">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9c0 3.98 2.58 7.35 6.18 8.54.45.08.62-.2.62-.44v-1.54c-2.5.54-3.03-1.2-3.03-1.2-.41-1.04-1-1.32-1-1.32-.82-.56.06-.55.06-.55.9.06 1.38.93 1.38.93.8 1.38 2.1 1 2.62.76.08-.58.31-1 .57-1.23-2-.23-4.1-1-4.1-4.45 0-.98.35-1.79.93-2.42-.09-.23-.4-1.14.09-2.38 0 0 .76-.24 2.48.92A8.65 8.65 0 0112 6.8c.77.004 1.55.1 2.28.3 1.72-1.16 2.48-.92 2.48-.92.49 1.24.18 2.15.09 2.38.58.63.93 1.44.93 2.42 0 3.46-2.1 4.22-4.11 4.44.32.28.61.83.61 1.67v2.48c0 .24.16.53.62.44A9.01 9.01 0 0021 12a9 9 0 00-9-9z"/></svg>
+          <span>Memory</span>
+        </button>
+        <button class="tab-btn" data-tab="settings-tab">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          <span>Persona</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- TAB 1: REAL-TIME CALL SCREEN -->
+    <main class="tab-content active" id="call-tab">
+      <div class="call-stage">
+        
+        <!-- Top Call Info -->
+        <div class="call-header-info">
+          <h2 class="friend-display-name" id="callFriendName">Nila</h2>
+          <p class="call-status" id="callStatusText">Ready to talk</p>
+          <div class="call-timer" id="callTimer" style="display: none;">00:00</div>
+        </div>
+
+        <!-- Glowing Orb & Avatar -->
+        <div class="avatar-center-wrapper">
+          <div class="pulse-ring ring-1"></div>
+          <div class="pulse-ring ring-2"></div>
+          <div class="pulse-ring ring-3"></div>
+          
+          <div class="avatar-circle" id="avatarCircle">
+            <div class="avatar-emoji" id="avatarEmoji">🌿</div>
+            <div class="speaking-indicator" id="speakingIndicator">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Mic Level Indicator -->
+        <div class="mic-meter-container" id="micMeterContainer" style="display: none;">
+          <span class="mic-meter-icon" id="micMeterIcon">🎙️</span>
+          <div class="mic-meter-track">
+            <div class="mic-meter-fill" id="micMeterFill"></div>
+          </div>
+          <span class="mic-meter-label" id="micMeterLabel">Listening...</span>
+        </div>
+
+        <!-- Live Subtitles & Captions -->
+        <div class="live-caption-box" id="captionBox">
+          <div class="caption-label" id="captionLabel">Shanthi</div>
+          <p class="caption-text" id="captionText">"Hey da! Click 'Start Call' to talk to me. Share whatever is on your mind!"</p>
+        </div>
+
+        <!-- Direct Tap-to-Speak Banner during call -->
+        <div class="tap-speak-container" id="tapSpeakContainer" style="display: none;">
+          <button class="tap-speak-btn" id="tapSpeakBtn">
+            <span class="tap-speak-icon">🎙️</span>
+            <span id="tapSpeakText">Tap to Speak</span>
+          </button>
+        </div>
+
+        <!-- Hands-free / Push to Talk Toggle & Quick Type -->
+        <div class="call-options-bar" id="callSubOptions" style="display: none;">
+          <label class="toggle-container">
+            <input type="checkbox" id="handsFreeToggle" checked>
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Hands-Free Auto Detection</span>
+          </label>
+          <button class="call-type-toggle-btn" id="callTypeToggleBtn" title="Type to talk">💬 Type</button>
+        </div>
+
+        <!-- In-Call Quick Type Input (Collapsible) -->
+        <div class="in-call-input-box" id="inCallInputBox" style="display: none;">
+          <input type="text" id="inCallTextInput" placeholder="Type what you want to say to your friend...">
+          <button id="inCallSendBtn">Send</button>
+        </div>
+
+        <!-- Call Action Controls -->
+        <div class="call-controls">
+          <!-- Standby Start Button -->
+          <button class="call-btn start-call-btn" id="startCallBtn" onclick="startCall()">
+            <div class="icon-circle green">
+              <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z"/></svg>
+            </div>
+            <span id="startCallBtnLabel">Call Nila</span>
+          </button>
+
+          <!-- Active Call Buttons (Hidden initially) -->
+          <div class="active-call-buttons" id="activeCallControls" style="display: none;">
+            <!-- Mute/Mic Toggle -->
+            <button class="circle-btn" id="muteBtn" title="Mute/Unmute Mic">
+              <svg id="micOnIcon" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+              <svg id="micOffIcon" width="22" height="22" fill="white" viewBox="0 0 24 24" style="display: none;"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9l4.19 4.18 1.27-1.27L4.27 3z"/></svg>
+            </button>
+
+            <!-- Push-to-Talk button for manual hold if continuous is off -->
+            <button class="circle-btn mic-talk-btn" id="talkBtn" title="Hold to Talk">
+              <span class="talk-text">Hold to Speak</span>
+            </button>
+
+            <!-- End Call Button -->
+            <button class="circle-btn end-call-btn" id="endCallBtn" onclick="endCall()" title="End Call">
+              <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.996.996 0 010-1.41C3.28 8.77 7.41 7 12 7s8.72 1.77 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- TAB 2: CHAT & VOICE NOTES -->
+    <main class="tab-content" id="chat-tab">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="friend-mini-avatar" id="chatFriendAvatar">🌸</div>
+          <div>
+            <h3 class="friend-mini-name" id="chatFriendName">Nila</h3>
+            <span class="friend-mini-status">Always here for you</span>
+          </div>
+          <button class="clear-chat-btn" id="clearChatBtn" title="Clear Chat">Clear</button>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+          <!-- Dynamic Messages will load here -->
+        </div>
+
+        <div class="chat-input-bar">
+          <input type="text" id="chatTextInput" placeholder="Type in Tanglish, Tamil or English..." />
+          <button class="send-btn" id="chatSendBtn">
+            <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 3: LONG-TERM MEMORY BRAIN -->
+    <main class="tab-content" id="memory-tab">
+      <div class="memory-container">
+        <div class="section-card">
+          <h3>🧠 Nila's Memory of You</h3>
+          <p class="subtitle">Things your friend remembers about your life, habits, feelings, and routine.</p>
+          
+          <div class="add-memory-row">
+            <input type="text" id="newMemoryInput" placeholder="Add something you want your friend to remember..." />
+            <button class="btn-primary" id="addMemoryBtn">Remember</button>
+          </div>
+
+          <div class="memories-list" id="memoriesList">
+            <!-- Memories loaded dynamically -->
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>📞 Past Calls & Heart-to-Hearts</h3>
+          <div class="calls-list" id="callsList">
+            <!-- Call history loaded dynamically -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 4: PERSONA & SETTINGS -->
+    <main class="tab-content" id="settings-tab">
+      <div class="settings-container">
+        <div class="section-card">
+          <h3>Choose Your AI Friend</h3>
+          <div class="persona-cards-grid">
+            <div class="persona-card active" data-name="Shanthi" data-voice="roopa" data-emoji="🌿">
+              <div class="p-emoji">🌿</div>
+              <h4>Shanthi (சாந்தி)</h4>
+              <p>Calm, deeply relaxing, mature confidante. Speaks slow, soothing, peaceful Tanglish.</p>
+              <span class="p-voice">Voice: Roopa (Calm & Mature)</span>
+            </div>
+
+            <div class="persona-card" data-name="Nila" data-voice="kavitha" data-emoji="🌸">
+              <div class="p-emoji">🌸</div>
+              <h4>Nila</h4>
+              <p>Warm, loving girl bestie. Cares deeply, listens to your stress, talks sweet Tanglish.</p>
+              <span class="p-voice">Voice: Kavitha (Warm Bestie)</span>
+            </div>
+
+            <div class="persona-card" data-name="Anand" data-voice="ratan" data-emoji="☕">
+              <div class="p-emoji">☕</div>
+              <h4>Anand</h4>
+              <p>Calm, mature, thoughtful elder brother/mentor. Grounding presence, deep relaxed voice.</p>
+              <span class="p-voice">Voice: Ratan (Calm & Deep)</span>
+            </div>
+
+            <div class="persona-card" data-name="Karthik" data-voice="gokul" data-emoji="⚡">
+              <div class="p-emoji">⚡</div>
+              <h4>Karthik</h4>
+              <p>Chill, supportive bro. Motivates you, cracks jokes, speaks friendly casual Tanglish.</p>
+              <span class="p-voice">Voice: Gokul (Casual Bro)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h3>Language & Preferences</h3>
+          
+          <div class="form-group">
+            <label>Your Name / Nickname:</label>
+            <input type="text" id="userNameInput" placeholder="Enter your name (e.g. Rahul, Priya)">
+          </div>
+
+          <div class="form-group">
+            <label>Conversation Language Style:</label>
+            <select id="languageSelect">
+              <option value="tanglish">Tanglish (Tamil + English Casual Mix) - Recommended</option>
+              <option value="tamil">Pure Tamil (தமிழ்)</option>
+              <option value="english">Indian English</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" id="saveProfileBtn">Save Persona</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- POST-CALL SUMMARY MODAL -->
+    <div class="modal-overlay" id="postCallModal">
+      <div class="modal-card">
+        <div class="modal-emoji" id="modalMoodEmoji">💖</div>
+        <h3 id="modalTitle">Call Ended with Nila</h3>
+        <p class="modal-summary" id="modalSummary">"You shared your day. Nila remembered you were feeling tired and recommended resting."</p>
+        
+        <div class="new-memories-box" id="newMemoriesBox">
+          <h4>✨ New things remembered:</h4>
+          <ul id="newMemoriesList"></ul>
+        </div>
+
+        <button class="btn-primary" id="closeModalBtn">Sweet, Thanks!</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
