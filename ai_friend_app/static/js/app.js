@@ -289,17 +289,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   drawWaveform();
 });
 
-// Navigation Handling
+// Navigation Handling (Desktop Tabs & Mobile Bottom Dock)
 function setupNavigation() {
-  const navBtns = document.querySelectorAll('.nav-btn');
+  const allNavBtns = document.querySelectorAll('.nav-btn, .dock-btn');
   const panels = document.querySelectorAll('.panel-section');
 
-  navBtns.forEach(btn => {
+  allNavBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      navBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
       const targetId = btn.getAttribute('data-tab');
+
+      allNavBtns.forEach(b => {
+        if (b.getAttribute('data-tab') === targetId) b.classList.add('active');
+        else b.classList.remove('active');
+      });
 
       // For desktop sidebar panels
       panels.forEach(p => {
@@ -311,9 +313,9 @@ function setupNavigation() {
       });
 
       // Mobile responsive toggle
+      const sidebar = document.querySelector('.sidebar-container');
+      const stage = document.querySelector('.stage-container');
       if (window.innerWidth <= 860) {
-        const sidebar = document.querySelector('.sidebar-container');
-        const stage = document.querySelector('.stage-container');
         if (targetId === 'call-panel') {
           stage.style.display = 'flex';
           sidebar.style.display = 'none';
@@ -337,6 +339,12 @@ async function loadProfile() {
     callerInitial.textContent = name.charAt(0);
     captionLabel.textContent = name;
     startCallBtnLabel.textContent = `Call ${name}`;
+
+    const headerName = document.getElementById('headerFriendName');
+    if (headerName) headerName.textContent = name;
+    const miniName = document.getElementById('miniFriendName');
+    if (miniName) miniName.textContent = name;
+
     currentLangBadge.textContent = (currentProfile.preferred_language || 'Tanglish').toUpperCase();
 
     // Descriptions
@@ -356,6 +364,15 @@ async function loadProfile() {
         opt.classList.add('active');
       } else {
         opt.classList.remove('active');
+      }
+    });
+
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+      if (item.dataset.name.toLowerCase() === name.toLowerCase()) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
       }
     });
   } catch (err) {
@@ -409,6 +426,8 @@ async function startCall() {
     standbyControls.style.display = 'none';
     activeCallControls.style.display = 'flex';
     callSubOptions.style.display = 'flex';
+    const minBtn = document.getElementById('minimizeCallBtn');
+    if (minBtn) minBtn.style.display = 'flex';
 
     // Unlock audio context
     try {
@@ -640,6 +659,11 @@ function resetCallUI() {
   const layout = document.querySelector('.app-layout');
   if (layout) layout.classList.remove('in-call-fullscreen');
 
+  const miniPill = document.getElementById('minimizedCallPill');
+  if (miniPill) miniPill.style.display = 'none';
+  const minBtn = document.getElementById('minimizeCallBtn');
+  if (minBtn) minBtn.style.display = 'none';
+
   isCallActive = false;
   currentCallId = null;
   standbyControls.style.display = 'flex';
@@ -657,7 +681,10 @@ function startTimer() {
     const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
     const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
     const secs = String(elapsed % 60).padStart(2, '0');
-    callTimer.textContent = `${mins}:${secs}`;
+    const timeStr = `${mins}:${secs}`;
+    callTimer.textContent = timeStr;
+    const miniTimer = document.getElementById('miniTimer');
+    if (miniTimer) miniTimer.textContent = timeStr;
   }, 1000);
 }
 
@@ -683,6 +710,92 @@ function showPostCallModal(analysis) {
 
 // =================== Event Listeners ===================
 function setupEventListeners() {
+  // Quick Persona Dropdown in Header
+  const quickPersonaBtn = document.getElementById('quickPersonaBtn');
+  const quickPersonaDropdown = document.getElementById('quickPersonaDropdown');
+  if (quickPersonaBtn && quickPersonaDropdown) {
+    quickPersonaBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = quickPersonaDropdown.style.display === 'flex';
+      quickPersonaDropdown.style.display = isVisible ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', () => {
+      if (quickPersonaDropdown) quickPersonaDropdown.style.display = 'none';
+    });
+
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+      item.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        quickPersonaDropdown.style.display = 'none';
+        const friendName = item.dataset.name;
+        const voice = item.dataset.voice;
+
+        const payload = {
+          user_name: userNameInput.value.trim() || 'Friend',
+          preferred_language: languageSelect.value,
+          ai_friend_name: friendName,
+          ai_voice: voice
+        };
+
+        await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        await loadProfile();
+      });
+    });
+  }
+
+  // Quick Language Toggle
+  const langSwitchBtn = document.getElementById('langSwitchBtn');
+  if (langSwitchBtn) {
+    langSwitchBtn.addEventListener('click', async () => {
+      const current = (currentProfile.preferred_language || 'tanglish').toLowerCase();
+      const nextLang = current === 'tanglish' ? 'tamil' : current === 'tamil' ? 'english' : 'tanglish';
+
+      const payload = {
+        user_name: currentProfile.user_name || 'Friend',
+        preferred_language: nextLang,
+        ai_friend_name: currentProfile.ai_friend_name || 'Shanthi',
+        ai_voice: currentProfile.ai_voice || 'shruti'
+      };
+
+      await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      await loadProfile();
+    });
+  }
+
+  // Minimize call (Browse app while keeping call running)
+  const minimizeCallBtn = document.getElementById('minimizeCallBtn');
+  if (minimizeCallBtn) {
+    minimizeCallBtn.addEventListener('click', () => {
+      const layout = document.querySelector('.app-layout');
+      if (layout) layout.classList.remove('in-call-fullscreen');
+      const minPill = document.getElementById('minimizedCallPill');
+      if (minPill && isCallActive) minPill.style.display = 'flex';
+    });
+  }
+
+  // Expand minimized call back to full screen
+  const expandCallBtn = document.getElementById('expandCallBtn');
+  if (expandCallBtn) {
+    expandCallBtn.addEventListener('click', () => {
+      const layout = document.querySelector('.app-layout');
+      if (layout) layout.classList.add('in-call-fullscreen');
+      const minPill = document.getElementById('minimizedCallPill');
+      if (minPill) minPill.style.display = 'none';
+    });
+  }
+
   if (startCallBtn) startCallBtn.addEventListener('click', startCall);
   if (endCallBtn) endCallBtn.addEventListener('click', endCall);
 
@@ -880,6 +993,9 @@ async function loadMemories() {
   try {
     const res = await fetch('/api/memories');
     const memories = await res.json();
+
+    const badge = document.getElementById('memoriesCountBadge');
+    if (badge) badge.textContent = memories.length;
 
     memoriesList.innerHTML = '';
     if (memories.length === 0) {
