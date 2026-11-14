@@ -3,261 +3,280 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nila - Your AI Friend (Tamil & Tanglish Voice Call)</title>
+  <title>Voice Companion - Tanglish & Tamil AI Friend</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <div class="app-container">
-
-    <!-- Top Navigation Tabs -->
+  <div class="app-layout">
+    
+    <!-- Top Quiet Header -->
     <header class="app-header">
-      <div class="brand">
-        <div class="status-dot online"></div>
-        <span class="brand-title">AI Bestie</span>
-        <span class="badge lang-badge" id="currentLangBadge">Tanglish</span>
+      <div class="header-left">
+        <span class="product-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        </span>
+        <div class="brand-info">
+          <span class="brand-name">Voice Companion</span>
+          <span class="brand-status"><span class="status-indicator"></span>Ready</span>
+        </div>
       </div>
-      <nav class="nav-tabs">
-        <button class="tab-btn active" data-tab="call-tab">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z"/></svg>
+
+      <nav class="header-nav">
+        <button class="nav-btn active" data-tab="call-panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           <span>Call</span>
         </button>
-        <button class="tab-btn" data-tab="chat-tab">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-          <span>Chat</span>
+        <button class="nav-btn" data-tab="chat-panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Transcript</span>
         </button>
-        <button class="tab-btn" data-tab="memory-tab">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9c0 3.98 2.58 7.35 6.18 8.54.45.08.62-.2.62-.44v-1.54c-2.5.54-3.03-1.2-3.03-1.2-.41-1.04-1-1.32-1-1.32-.82-.56.06-.55.06-.55.9.06 1.38.93 1.38.93.8 1.38 2.1 1 2.62.76.08-.58.31-1 .57-1.23-2-.23-4.1-1-4.1-4.45 0-.98.35-1.79.93-2.42-.09-.23-.4-1.14.09-2.38 0 0 .76-.24 2.48.92A8.65 8.65 0 0112 6.8c.77.004 1.55.1 2.28.3 1.72-1.16 2.48-.92 2.48-.92.49 1.24.18 2.15.09 2.38.58.63.93 1.44.93 2.42 0 3.46-2.1 4.22-4.11 4.44.32.28.61.83.61 1.67v2.48c0 .24.16.53.62.44A9.01 9.01 0 0021 12a9 9 0 00-9-9z"/></svg>
+        <button class="nav-btn" data-tab="memory-panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           <span>Memory</span>
         </button>
-        <button class="tab-btn" data-tab="settings-tab">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          <span>Persona</span>
+        <button class="nav-btn" data-tab="persona-panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Voice</span>
         </button>
       </nav>
+
+      <div class="header-right">
+        <span class="lang-tag" id="currentLangBadge">Tanglish</span>
+      </div>
     </header>
 
-    <!-- TAB 1: REAL-TIME CALL SCREEN -->
-    <main class="tab-content active" id="call-tab">
-      <div class="call-stage">
+    <!-- Main Workspace -->
+    <div class="workspace-grid">
+
+      <!-- LEFT: Primary Call Stage (The Craft / Bright Element) -->
+      <section class="stage-container" id="call-panel">
         
-        <!-- Top Call Info -->
-        <div class="call-header-info">
-          <h2 class="friend-display-name" id="callFriendName">Nila</h2>
-          <p class="call-status" id="callStatusText">Ready to talk</p>
-          <div class="call-timer" id="callTimer" style="display: none;">00:00</div>
+        <!-- Active Session Meta Bar -->
+        <div class="session-bar">
+          <div class="caller-meta">
+            <span class="active-dot" id="activeDot"></span>
+            <span class="active-status" id="callStatusText">Ready to connect</span>
+          </div>
+          <div class="timer-display" id="callTimer">00:00</div>
         </div>
 
-        <!-- Glowing Orb & Avatar -->
-        <div class="avatar-center-wrapper">
-          <div class="pulse-ring ring-1"></div>
-          <div class="pulse-ring ring-2"></div>
-          <div class="pulse-ring ring-3"></div>
+        <!-- The Acoustic Wave Chamber -->
+        <div class="acoustic-chamber">
+          <div class="caller-avatar-card">
+            <div class="caller-initial" id="callerInitial">S</div>
+            <h1 class="caller-name" id="callFriendName">Shanthi</h1>
+            <p class="caller-desc" id="callerDesc">Calm, mature woman voice · Speaks Tanglish & Tamil</p>
+          </div>
+
+          <!-- Real Dynamic Audio Visualizer Canvas -->
+          <div class="waveform-box">
+            <canvas id="waveformCanvas" width="480" height="100"></canvas>
+            <div class="mic-level-track">
+              <div class="mic-level-fill" id="micMeterFill"></div>
+            </div>
+            <div class="acoustic-meta">
+              <span class="mic-status-label" id="micMeterLabel">Microphone standby</span>
+              <span class="codec-label">16kHz PCM · Bulbul v3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Subtitles Card -->
+        <div class="caption-card">
+          <div class="caption-speaker" id="captionLabel">Shanthi</div>
+          <p class="caption-dialogue" id="captionText">"Vanakkam pa, Shanthi pesuren. Nalla relax ah ukkanthu sollu... how was your day?"</p>
+        </div>
+
+        <!-- In-Call Collapsible Text Fallback -->
+        <div class="in-call-input-row" id="inCallInputBox" style="display: none;">
+          <input type="text" id="inCallTextInput" placeholder="Type a message if you prefer not to speak...">
+          <button class="btn-subtle" id="inCallSendBtn">Send</button>
+        </div>
+
+        <!-- Call Action Desk -->
+        <div class="call-action-deck">
           
-          <div class="avatar-circle" id="avatarCircle">
-            <div class="avatar-emoji" id="avatarEmoji">🌿</div>
-            <div class="speaking-indicator" id="speakingIndicator">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Live Mic Level Indicator -->
-        <div class="mic-meter-container" id="micMeterContainer" style="display: none;">
-          <span class="mic-meter-icon" id="micMeterIcon">🎙️</span>
-          <div class="mic-meter-track">
-            <div class="mic-meter-fill" id="micMeterFill"></div>
-          </div>
-          <span class="mic-meter-label" id="micMeterLabel">Listening...</span>
-        </div>
-
-        <!-- Live Subtitles & Captions -->
-        <div class="live-caption-box" id="captionBox">
-          <div class="caption-label" id="captionLabel">Shanthi</div>
-          <p class="caption-text" id="captionText">"Hey da! Click 'Start Call' to talk to me. Share whatever is on your mind!"</p>
-        </div>
-
-        <!-- Direct Tap-to-Speak Banner during call -->
-        <div class="tap-speak-container" id="tapSpeakContainer" style="display: none;">
-          <button class="tap-speak-btn" id="tapSpeakBtn">
-            <span class="tap-speak-icon">🎙️</span>
-            <span id="tapSpeakText">Tap to Speak</span>
-          </button>
-        </div>
-
-        <!-- Hands-free / Push to Talk Toggle & Quick Type -->
-        <div class="call-options-bar" id="callSubOptions" style="display: none;">
-          <label class="toggle-container">
-            <input type="checkbox" id="handsFreeToggle" checked>
-            <span class="toggle-slider"></span>
-            <span class="toggle-text">Hands-Free Auto Detection</span>
-          </label>
-          <button class="call-type-toggle-btn" id="callTypeToggleBtn" title="Type to talk">💬 Type</button>
-        </div>
-
-        <!-- In-Call Quick Type Input (Collapsible) -->
-        <div class="in-call-input-box" id="inCallInputBox" style="display: none;">
-          <input type="text" id="inCallTextInput" placeholder="Type what you want to say to your friend...">
-          <button id="inCallSendBtn">Send</button>
-        </div>
-
-        <!-- Call Action Controls -->
-        <div class="call-controls">
-          <!-- Standby Start Button -->
-          <button class="call-btn start-call-btn" id="startCallBtn" onclick="startCall()">
-            <div class="icon-circle green">
-              <svg width="28" height="28" fill="white" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.21 2.2z"/></svg>
-            </div>
-            <span id="startCallBtnLabel">Call Nila</span>
-          </button>
-
-          <!-- Active Call Buttons (Hidden initially) -->
-          <div class="active-call-buttons" id="activeCallControls" style="display: none;">
-            <!-- Mute/Mic Toggle -->
-            <button class="circle-btn" id="muteBtn" title="Mute/Unmute Mic">
-              <svg id="micOnIcon" width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-              <svg id="micOffIcon" width="22" height="22" fill="white" viewBox="0 0 24 24" style="display: none;"><path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9l4.19 4.18 1.27-1.27L4.27 3z"/></svg>
-            </button>
-
-            <!-- Push-to-Talk button for manual hold if continuous is off -->
-            <button class="circle-btn mic-talk-btn" id="talkBtn" title="Hold to Talk">
-              <span class="talk-text">Hold to Speak</span>
-            </button>
-
-            <!-- End Call Button -->
-            <button class="circle-btn end-call-btn" id="endCallBtn" onclick="endCall()" title="End Call">
-              <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.996.996 0 010-1.41C3.28 8.77 7.41 7 12 7s8.72 1.77 11.71 4.67c.39.39.39 1.02 0 1.41l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
+          <!-- Standby Start State -->
+          <div class="standby-actions" id="standbyControls">
+            <button class="primary-dial-btn" id="startCallBtn" onclick="startCall()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span id="startCallBtnLabel">Call Shanthi</span>
             </button>
           </div>
-        </div>
 
-      </div>
-    </main>
+          <!-- In-Call Controls -->
+          <div class="connected-actions" id="activeCallControls" style="display: none;">
+            
+            <button class="tactile-btn" id="muteBtn" title="Toggle microphone">
+              <svg id="micOnIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <svg id="micOffIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display: none;"><line x1="2" x2="22" y1="2" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </button>
 
-    <!-- TAB 2: CHAT & VOICE NOTES -->
-    <main class="tab-content" id="chat-tab">
-      <div class="chat-container">
-        <div class="chat-header">
-          <div class="friend-mini-avatar" id="chatFriendAvatar">🌸</div>
-          <div>
-            <h3 class="friend-mini-name" id="chatFriendName">Nila</h3>
-            <span class="friend-mini-status">Always here for you</span>
-          </div>
-          <button class="clear-chat-btn" id="clearChatBtn" title="Clear Chat">Clear</button>
-        </div>
+            <!-- Push-to-Talk / Tap-to-Speak button -->
+            <button class="talk-pill-btn" id="tapSpeakBtn">
+              <span class="talk-rec-dot"></span>
+              <span id="tapSpeakText">Tap to speak</span>
+            </button>
 
-        <div class="messages-container" id="messagesContainer">
-          <!-- Dynamic Messages will load here -->
-        </div>
+            <button class="tactile-btn text-mode-btn" id="callTypeToggleBtn" title="Type to talk">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
 
-        <div class="chat-input-bar">
-          <input type="text" id="chatTextInput" placeholder="Type in Tanglish, Tamil or English..." />
-          <button class="send-btn" id="chatSendBtn">
-            <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
-        </div>
-      </div>
-    </main>
-
-    <!-- TAB 3: LONG-TERM MEMORY BRAIN -->
-    <main class="tab-content" id="memory-tab">
-      <div class="memory-container">
-        <div class="section-card">
-          <h3>🧠 Nila's Memory of You</h3>
-          <p class="subtitle">Things your friend remembers about your life, habits, feelings, and routine.</p>
-          
-          <div class="add-memory-row">
-            <input type="text" id="newMemoryInput" placeholder="Add something you want your friend to remember..." />
-            <button class="btn-primary" id="addMemoryBtn">Remember</button>
+            <button class="tactile-btn end-btn" id="endCallBtn" onclick="endCall()" title="End call">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="22" x2="2" y1="2" y2="22"/></svg>
+            </button>
           </div>
 
-          <div class="memories-list" id="memoriesList">
-            <!-- Memories loaded dynamically -->
+          <!-- Bottom Option Toggles -->
+          <div class="call-footer-bar" id="callSubOptions" style="display: none;">
+            <label class="switch-row">
+              <input type="checkbox" id="handsFreeToggle" checked>
+              <span class="switch-box"></span>
+              <span class="switch-text">Hands-free voice detection</span>
+            </label>
           </div>
-        </div>
 
-        <div class="section-card">
-          <h3>📞 Past Calls & Heart-to-Hearts</h3>
-          <div class="calls-list" id="callsList">
-            <!-- Call history loaded dynamically -->
-          </div>
         </div>
-      </div>
-    </main>
+      </section>
 
-    <!-- TAB 4: PERSONA & SETTINGS -->
-    <main class="tab-content" id="settings-tab">
-      <div class="settings-container">
-        <div class="section-card">
-          <h3>Choose Your AI Friend</h3>
-          <div class="persona-cards-grid">
-            <div class="persona-card active" data-name="Shanthi" data-voice="roopa" data-emoji="🌿">
-              <div class="p-emoji">🌿</div>
-              <h4>Shanthi (சாந்தி)</h4>
-              <p>Calm, deeply relaxing, mature confidante. Speaks slow, soothing, peaceful Tanglish.</p>
-              <span class="p-voice">Voice: Roopa (Calm & Mature)</span>
+      <!-- RIGHT: Context & Vault Sidepanel (Transcript / Memories / Persona) -->
+      <aside class="sidebar-container">
+        
+        <!-- Tab 1: Chat / Transcript History -->
+        <div class="panel-section" id="chat-panel">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Conversation</h2>
+              <p class="section-desc">Live call transcript and voice messages</p>
             </div>
+            <button class="btn-ghost" id="clearChatBtn">Clear</button>
+          </div>
 
-            <div class="persona-card" data-name="Nila" data-voice="kavitha" data-emoji="🌸">
-              <div class="p-emoji">🌸</div>
-              <h4>Nila</h4>
-              <p>Warm, loving girl bestie. Cares deeply, listens to your stress, talks sweet Tanglish.</p>
-              <span class="p-voice">Voice: Kavitha (Warm Bestie)</span>
-            </div>
+          <div class="messages-stream" id="messagesContainer">
+            <!-- Messages render here -->
+          </div>
 
-            <div class="persona-card" data-name="Anand" data-voice="ratan" data-emoji="☕">
-              <div class="p-emoji">☕</div>
-              <h4>Anand</h4>
-              <p>Calm, mature, thoughtful elder brother/mentor. Grounding presence, deep relaxed voice.</p>
-              <span class="p-voice">Voice: Ratan (Calm & Deep)</span>
-            </div>
+          <div class="chat-composer">
+            <input type="text" id="chatTextInput" placeholder="Write in Tanglish, Tamil or English...">
+            <button class="btn-send" id="chatSendBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
 
-            <div class="persona-card" data-name="Karthik" data-voice="gokul" data-emoji="⚡">
-              <div class="p-emoji">⚡</div>
-              <h4>Karthik</h4>
-              <p>Chill, supportive bro. Motivates you, cracks jokes, speaks friendly casual Tanglish.</p>
-              <span class="p-voice">Voice: Gokul (Casual Bro)</span>
+        <!-- Tab 2: Memory Vault -->
+        <div class="panel-section" id="memory-panel" style="display: none;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Memory Vault</h2>
+              <p class="section-desc">Facts and preferences remembered from your calls</p>
             </div>
           </div>
-        </div>
 
-        <div class="section-card">
-          <h3>Language & Preferences</h3>
-          
-          <div class="form-group">
-            <label>Your Name / Nickname:</label>
-            <input type="text" id="userNameInput" placeholder="Enter your name (e.g. Rahul, Priya)">
+          <div class="memory-input-row">
+            <input type="text" id="newMemoryInput" placeholder="Add a personal fact to remember...">
+            <button class="btn-secondary" id="addMemoryBtn">Save</button>
           </div>
 
-          <div class="form-group">
-            <label>Conversation Language Style:</label>
-            <select id="languageSelect">
-              <option value="tanglish">Tanglish (Tamil + English Casual Mix) - Recommended</option>
-              <option value="tamil">Pure Tamil (தமிழ்)</option>
+          <div class="memory-card-list" id="memoriesList">
+            <!-- Memory cards load here -->
+          </div>
+
+          <div class="section-header" style="margin-top: 24px;">
+            <div>
+              <h3 class="section-subtitle">Call History</h3>
+            </div>
+          </div>
+          <div class="call-log-list" id="callsList">
+            <!-- Call history logs load here -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Persona & Voice Settings -->
+        <div class="panel-section" id="persona-panel" style="display: none;">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">Voice & Persona</h2>
+              <p class="section-desc">Select who you talk to and their vocal style</p>
+            </div>
+          </div>
+
+          <div class="persona-selector-grid">
+            <div class="persona-option active" data-name="Shanthi" data-voice="shruti" data-initial="S">
+              <div class="opt-header">
+                <span class="opt-name">Shanthi</span>
+                <span class="opt-tag">Feminine · Calm</span>
+              </div>
+              <p class="opt-desc">Gentle, mature woman's voice. Unhurried cadence, grounding presence, empathetic.</p>
+              <span class="opt-vocal">Voice: Shruti (Natural Tamil Female)</span>
+            </div>
+
+            <div class="persona-option" data-name="Nila" data-voice="kavitha" data-initial="N">
+              <div class="opt-header">
+                <span class="opt-name">Nila</span>
+                <span class="opt-tag">Feminine · Cheerful</span>
+              </div>
+              <p class="opt-desc">Warm, affectionate girl bestie. Bubbly Tanglish, caring, celebrates your moments.</p>
+              <span class="opt-vocal">Voice: Kavitha (Warm Tamil Bestie)</span>
+            </div>
+
+            <div class="persona-option" data-name="Priya" data-voice="priya" data-initial="P">
+              <div class="opt-header">
+                <span class="opt-name">Priya</span>
+                <span class="opt-tag">Feminine · Soothing</span>
+              </div>
+              <p class="opt-desc">Soft, reassuring confidante. Attentive listener, helps unwind stress.</p>
+              <span class="opt-vocal">Voice: Priya (Soft Tamil Female)</span>
+            </div>
+
+            <div class="persona-option" data-name="Karthik" data-voice="gokul" data-initial="K">
+              <div class="opt-header">
+                <span class="opt-name">Karthik</span>
+                <span class="opt-tag">Masculine · Casual</span>
+              </div>
+              <p class="opt-desc">Chill, supportive bro. Motivational, humorous, everyday casual talk.</p>
+              <span class="opt-vocal">Voice: Gokul (Friendly Male)</span>
+            </div>
+          </div>
+
+          <div class="config-group" style="margin-top: 20px;">
+            <label class="config-label">Your Name</label>
+            <input type="text" id="userNameInput" class="config-input" placeholder="How your friend calls you">
+          </div>
+
+          <div class="config-group">
+            <label class="config-label">Language Preference</label>
+            <select id="languageSelect" class="config-select">
+              <option value="tanglish">Tanglish (Tamil + English Casual Mix)</option>
+              <option value="tamil">Tamil (தமிழ்)</option>
               <option value="english">Indian English</option>
             </select>
           </div>
 
-          <button class="btn-primary" id="saveProfileBtn">Save Persona</button>
+          <button class="btn-primary" id="saveProfileBtn">Save Preferences</button>
         </div>
-      </div>
-    </main>
 
-    <!-- POST-CALL SUMMARY MODAL -->
-    <div class="modal-overlay" id="postCallModal">
-      <div class="modal-card">
-        <div class="modal-emoji" id="modalMoodEmoji">💖</div>
-        <h3 id="modalTitle">Call Ended with Nila</h3>
-        <p class="modal-summary" id="modalSummary">"You shared your day. Nila remembered you were feeling tired and recommended resting."</p>
-        
-        <div class="new-memories-box" id="newMemoriesBox">
-          <h4>✨ New things remembered:</h4>
+      </aside>
+    </div>
+
+    <!-- Post-Call Reflection Modal -->
+    <div class="modal-backdrop" id="postCallModal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <span class="modal-mood-badge" id="modalMoodEmoji">Reflective</span>
+          <h3 class="modal-title" id="modalTitle">Call Summary</h3>
+        </div>
+        <p class="modal-body" id="modalSummary">"You shared your thoughts and discussed your day."</p>
+
+        <div class="modal-facts" id="newMemoriesBox">
+          <span class="facts-label">Remembered for next call</span>
           <ul id="newMemoriesList"></ul>
         </div>
 
-        <button class="btn-primary" id="closeModalBtn">Sweet, Thanks!</button>
+        <button class="btn-primary" id="closeModalBtn" style="width: 100%;">Done</button>
       </div>
     </div>
 

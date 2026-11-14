@@ -19,7 +19,7 @@ def init_db():
         user_name TEXT DEFAULT 'Friend',
         preferred_language TEXT DEFAULT 'tanglish', -- 'tanglish', 'tamil', 'english'
         ai_friend_name TEXT DEFAULT 'Shanthi',
-        ai_voice TEXT DEFAULT 'roopa',              -- 'roopa', 'kavitha', 'priya', 'gokul', 'ratan'
+        ai_voice TEXT DEFAULT 'shruti',              -- 'shruti', 'kavitha', 'priya', 'gokul', 'ratan'
         user_bio TEXT DEFAULT 'A hardworking person who loves casual talks and sharing daily life.',
         relationship_tone TEXT DEFAULT 'calm_mature_confidante',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

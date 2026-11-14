@@ -1,4 +1,4 @@
-// State
+// State Management
 let currentCallId = null;
 let callStartTime = null;
 let callTimerInterval = null;
@@ -13,17 +13,19 @@ let volumeCheckInterval = null;
 let isUserSpeaking = false;
 let silenceStart = null;
 let isManualRecording = false;
+let animationFrameId = null;
 
 // DOM Elements
-const callStage = document.querySelector('.call-stage');
+const stageContainer = document.querySelector('.stage-container');
 const startCallBtn = document.getElementById('startCallBtn');
+const startCallBtnLabel = document.getElementById('startCallBtnLabel');
 const activeCallControls = document.getElementById('activeCallControls');
+const standbyControls = document.getElementById('standbyControls');
 const muteBtn = document.getElementById('muteBtn');
-const talkBtn = document.getElementById('talkBtn');
 const endCallBtn = document.getElementById('endCallBtn');
 const callStatusText = document.getElementById('callStatusText');
+const activeDot = document.getElementById('activeDot');
 const callTimer = document.getElementById('callTimer');
-const captionBox = document.getElementById('captionBox');
 const captionLabel = document.getElementById('captionLabel');
 const captionText = document.getElementById('captionText');
 const handsFreeToggle = document.getElementById('handsFreeToggle');
@@ -33,13 +35,18 @@ const inCallInputBox = document.getElementById('inCallInputBox');
 const inCallTextInput = document.getElementById('inCallTextInput');
 const inCallSendBtn = document.getElementById('inCallSendBtn');
 
-// Mic Meter & Tap Speak
-const micMeterContainer = document.getElementById('micMeterContainer');
+// Caller Card
+const callerName = document.getElementById('callFriendName');
+const callerDesc = document.getElementById('callerDesc');
+const callerInitial = document.getElementById('callerInitial');
+
+// Mic Level & Canvas
 const micMeterFill = document.getElementById('micMeterFill');
 const micMeterLabel = document.getElementById('micMeterLabel');
-const tapSpeakContainer = document.getElementById('tapSpeakContainer');
 const tapSpeakBtn = document.getElementById('tapSpeakBtn');
 const tapSpeakText = document.getElementById('tapSpeakText');
+const canvas = document.getElementById('waveformCanvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
 
 // Modal Elements
 const postCallModal = document.getElementById('postCallModal');
@@ -63,10 +70,10 @@ const addMemoryBtn = document.getElementById('addMemoryBtn');
 const userNameInput = document.getElementById('userNameInput');
 const languageSelect = document.getElementById('languageSelect');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-const personaCards = document.querySelectorAll('.persona-card');
+const personaOptions = document.querySelectorAll('.persona-option');
 const currentLangBadge = document.getElementById('currentLangBadge');
 
-// =================== WAV Audio Recorder Class ===================
+// =================== Native 16kHz PCM WAV Recorder ===================
 class NativeWavRecorder {
   constructor() {
     this.audioContext = null;
@@ -178,12 +185,12 @@ class NativeWavRecorder {
     writeString(view, 8, 'WAVE');
     writeString(view, 12, 'fmt ');
     view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM format
-    view.setUint16(22, 1, true); // Mono
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
     view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true); // Byte rate
-    view.setUint16(32, 2, true); // Block align
-    view.setUint16(34, 16, true); // Bits per sample
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
     writeString(view, 36, 'data');
     view.setUint32(40, samples.length * 2, true);
 
@@ -194,81 +201,148 @@ class NativeWavRecorder {
     }
     return view;
   }
+}
 
-  close() {
-    this.isRecording = false;
-    if (this.processor) {
-      this.processor.disconnect();
-      this.processor = null;
+// =================== Acoustic Waveform Canvas ===================
+let wavePhase = 0;
+function drawWaveform() {
+  if (!ctx || !canvas) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+
+  let amplitude = 4;
+  let frequency = 0.02;
+
+  if (isCallActive) {
+    if (!audioPlayer.paused) {
+      // AI speaking: energetic rhythmic wave
+      amplitude = 22;
+      frequency = 0.035;
+      wavePhase += 0.12;
+    } else if (micRecorder && micRecorder.getVolume() > 10) {
+      // User speaking
+      const vol = micRecorder.getVolume();
+      amplitude = Math.min(28, 6 + vol * 0.7);
+      frequency = 0.04;
+      wavePhase += 0.09;
+    } else {
+      // Idle in call
+      amplitude = 6;
+      wavePhase += 0.03;
     }
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
-    }
-    if (this.mediaStream) {
-      this.mediaStream.getTracks().forEach(t => t.stop());
-      this.mediaStream = null;
-    }
+  } else {
+    // Standby
+    amplitude = 3;
+    wavePhase += 0.015;
   }
+
+  // Draw 2 overlay sine curves for clean acoustic depth
+  ctx.beginPath();
+  ctx.strokeStyle = isCallActive ? 'rgba(16, 185, 129, 0.7)' : 'rgba(148, 163, 184, 0.3)';
+  ctx.lineWidth = 2;
+
+  for (let x = 0; x < width; x++) {
+    const y = height / 2 + Math.sin(x * frequency + wavePhase) * amplitude;
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Second quieter harmonic
+  ctx.beginPath();
+  ctx.strokeStyle = isCallActive ? 'rgba(16, 185, 129, 0.25)' : 'rgba(148, 163, 184, 0.15)';
+  ctx.lineWidth = 1.5;
+
+  for (let x = 0; x < width; x++) {
+    const y = height / 2 + Math.cos(x * (frequency * 0.8) - wavePhase) * (amplitude * 0.65);
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  animationFrameId = requestAnimationFrame(drawWaveform);
 }
 
 // =================== Initialization ===================
 document.addEventListener('DOMContentLoaded', async () => {
-  setupTabs();
+  setupNavigation();
   await loadProfile();
   await loadMemories();
   await loadHistory();
   setupSpeechRecognition();
   setupEventListeners();
+  drawWaveform();
 });
 
-// Tab Navigation
-function setupTabs() {
-  const tabs = document.querySelectorAll('.tab-btn');
-  const contents = document.querySelectorAll('.tab-content');
+// Navigation Handling
+function setupNavigation() {
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const panels = document.querySelectorAll('.panel-section');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      contents.forEach(c => c.classList.remove('active'));
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-      tab.classList.add('active');
-      const targetId = tab.getAttribute('data-tab');
-      document.getElementById(targetId).classList.add('active');
+      const targetId = btn.getAttribute('data-tab');
 
-      if (targetId === 'chat-tab') loadHistory();
-      if (targetId === 'memory-tab') {
-        loadMemories();
-        loadHistory();
+      // For desktop sidebar panels
+      panels.forEach(p => {
+        if (p.id === targetId) {
+          p.style.display = 'flex';
+        } else if (targetId !== 'call-panel') {
+          p.style.display = 'none';
+        }
+      });
+
+      // Mobile responsive toggle
+      if (window.innerWidth <= 860) {
+        const sidebar = document.querySelector('.sidebar-container');
+        const stage = document.querySelector('.stage-container');
+        if (targetId === 'call-panel') {
+          stage.style.display = 'flex';
+          sidebar.style.display = 'none';
+        } else {
+          stage.style.display = 'none';
+          sidebar.style.display = 'flex';
+        }
       }
     });
   });
 }
 
-// Load User & Persona Profile
+// Load Profile
 async function loadProfile() {
   try {
     const res = await fetch('/api/profile');
     currentProfile = await res.json();
 
-    document.getElementById('callFriendName').textContent = currentProfile.ai_friend_name || 'Shanthi';
-    document.getElementById('chatFriendName').textContent = currentProfile.ai_friend_name || 'Shanthi';
-    const btnLabel = document.getElementById('startCallBtnLabel');
-    if (btnLabel) btnLabel.textContent = `Call ${currentProfile.ai_friend_name || 'Shanthi'}`;
-    captionLabel.textContent = currentProfile.ai_friend_name || 'Shanthi';
-    
+    const name = currentProfile.ai_friend_name || 'Shanthi';
+    callerName.textContent = name;
+    callerInitial.textContent = name.charAt(0);
+    captionLabel.textContent = name;
+    startCallBtnLabel.textContent = `Call ${name}`;
     currentLangBadge.textContent = (currentProfile.preferred_language || 'Tanglish').toUpperCase();
+
+    // Descriptions
+    const descriptions = {
+      'shanthi': "Calm, mature woman's voice · Speaks Tanglish & Tamil",
+      'nila': "Warm, affectionate bestie · Speaks modern Tanglish",
+      'priya': "Soft, gentle confidante · Speaks peaceful Tamil",
+      'karthik': "Casual, supportive brother · Everyday casual chat"
+    };
+    callerDesc.textContent = descriptions[name.toLowerCase()] || "Conversational voice companion";
+
     userNameInput.value = currentProfile.user_name || 'Friend';
     languageSelect.value = currentProfile.preferred_language || 'tanglish';
 
-    // Highlight active persona card
-    personaCards.forEach(card => {
-      if (card.dataset.name.toLowerCase() === (currentProfile.ai_friend_name || 'shanthi').toLowerCase()) {
-        card.classList.add('active');
-        document.getElementById('avatarEmoji').textContent = card.dataset.emoji || '🌿';
-        document.getElementById('chatFriendAvatar').textContent = card.dataset.emoji || '🌿';
+    personaOptions.forEach(opt => {
+      if (opt.dataset.name.toLowerCase() === name.toLowerCase()) {
+        opt.classList.add('active');
       } else {
-        card.classList.remove('active');
+        opt.classList.remove('active');
       }
     });
   } catch (err) {
@@ -276,7 +350,7 @@ async function loadProfile() {
   }
 }
 
-// Setup Browser Speech Recognition (Fallback / Parallel)
+// Setup Speech Recognition
 function setupSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return;
@@ -310,30 +384,27 @@ function setupSpeechRecognition() {
   recognition.onerror = () => {};
 }
 
-// Start Call Flow
+// =================== Call Lifecycle ===================
 async function startCall() {
   try {
-    callStatusText.textContent = 'Calling...';
-    callStage.classList.add('in-call');
-    startCallBtn.style.display = 'none';
+    callStatusText.textContent = 'Connecting...';
+    activeDot.classList.add('live');
+    stageContainer.classList.add('in-call');
+    standbyControls.style.display = 'none';
     activeCallControls.style.display = 'flex';
     callSubOptions.style.display = 'flex';
-    tapSpeakContainer.style.display = 'flex';
-    micMeterContainer.style.display = 'flex';
-    callTimer.style.display = 'block';
 
     // Unlock audio context
     try {
       audioPlayer.play().then(() => audioPlayer.pause()).catch(() => {});
     } catch(e) {}
 
-    // Initialize native mic recorder
+    // Init native mic recorder
     if (!micRecorder) {
       micRecorder = new NativeWavRecorder();
     }
     await micRecorder.init();
 
-    // Start volume monitoring and VAD
     startVolumeMonitor();
 
     const res = await fetch('/api/call/start', { method: 'POST' });
@@ -353,18 +424,17 @@ async function startCall() {
     if (data.greeting_audio) {
       playAiVoice(data.greeting_audio);
     } else {
-      callStatusText.textContent = 'Connected (In Call)';
+      callStatusText.textContent = 'Connected';
       startListeningCycle();
     }
   } catch (err) {
     console.error('Call failed:', err);
-    callStatusText.textContent = 'Call failed. Try again.';
-    alert('Could not start call. Please check microphone permission and server.');
+    callStatusText.textContent = 'Connection failed';
+    alert('Could not start call. Please check microphone permissions.');
     resetCallUI();
   }
 }
 
-// Start Volume & Voice Activity Detection Loop
 function startVolumeMonitor() {
   clearInterval(volumeCheckInterval);
   volumeCheckInterval = setInterval(() => {
@@ -376,7 +446,6 @@ function startVolumeMonitor() {
     const vol = micRecorder.getVolume();
     micMeterFill.style.width = `${Math.min(100, vol * 2.5)}%`;
 
-    // Only do VAD if continuous hands-free is enabled and AI isn't talking and not in manual mode
     if (handsFreeToggle.checked && !isManualRecording && audioPlayer.paused) {
       const speechThreshold = 14;
 
@@ -385,19 +454,17 @@ function startVolumeMonitor() {
           isUserSpeaking = true;
           silenceStart = null;
           micRecorder.start();
-          micMeterLabel.textContent = 'Speaking...';
+          micMeterLabel.textContent = 'Voice detected';
           callStatusText.textContent = 'Listening to you...';
         }
         silenceStart = null;
       } else if (isUserSpeaking) {
-        // Voice was active, now checking silence
         if (!silenceStart) {
           silenceStart = Date.now();
         } else if (Date.now() - silenceStart > 1200) {
-          // 1.2s silence reached -> finish recording and send
           isUserSpeaking = false;
           silenceStart = null;
-          micMeterLabel.textContent = 'Processing...';
+          micMeterLabel.textContent = 'Processing speech...';
           const wavBlob = micRecorder.stop();
           if (wavBlob && wavBlob.size > 2000) {
             processRecordedAudio(wavBlob);
@@ -413,7 +480,7 @@ function startVolumeMonitor() {
 function startListeningCycle() {
   if (!isCallActive || isMuted || !audioPlayer.paused) return;
   micMeterLabel.textContent = 'Listening...';
-  callStatusText.textContent = 'Connected (Listening...)';
+  callStatusText.textContent = 'Connected (Listening)';
 
   if (recognition) {
     try {
@@ -429,12 +496,12 @@ function stopListeningCycle() {
   }
 }
 
-// Process audio via Sarvam saaras:v3 STT
+// Process user audio via Sarvam saaras:v3 STT
 async function processRecordedAudio(wavBlob) {
   stopListeningCycle();
   callStatusText.textContent = `${currentProfile.ai_friend_name || 'Shanthi'} is listening...`;
   captionLabel.textContent = currentProfile.user_name || 'You';
-  captionText.textContent = '"Transcribing your voice..."';
+  captionText.textContent = '"Listening..."';
 
   try {
     const formData = new FormData();
@@ -451,14 +518,13 @@ async function processRecordedAudio(wavBlob) {
       captionText.textContent = `"${transcript}"`;
       handleUserSpokenMessage(transcript);
     } else {
-      console.log('STT returned empty transcript');
-      captionText.textContent = '"(I didn\'t catch that, can you repeat?)"';
-      callStatusText.textContent = 'Connected (In Call)';
+      captionText.textContent = '"(Could not hear clearly, could you say that again?)"';
+      callStatusText.textContent = 'Connected';
       if (isCallActive && handsFreeToggle.checked) startListeningCycle();
     }
   } catch (err) {
     console.error('STT upload error:', err);
-    callStatusText.textContent = 'Connected (In Call)';
+    callStatusText.textContent = 'Connected';
     if (isCallActive && handsFreeToggle.checked) startListeningCycle();
   }
 }
@@ -487,28 +553,29 @@ async function handleUserSpokenMessage(text) {
     if (data.audio_base64) {
       playAiVoice(data.audio_base64);
     } else {
-      callStatusText.textContent = 'Connected (In Call)';
+      callStatusText.textContent = 'Connected';
       if (isCallActive && handsFreeToggle.checked && !isMuted) startListeningCycle();
     }
   } catch (err) {
-    console.error('Error in chat:', err);
-    callStatusText.textContent = 'Connected (In Call)';
+    console.error('Chat error:', err);
+    callStatusText.textContent = 'Connected';
     if (isCallActive && handsFreeToggle.checked && !isMuted) startListeningCycle();
   }
 }
 
 function playAiVoice(base64Audio) {
   stopListeningCycle();
-  callStage.classList.add('speaking');
+  stageContainer.classList.add('speaking');
   callStatusText.textContent = `${currentProfile.ai_friend_name || 'Shanthi'} is speaking...`;
-  if (micMeterLabel) micMeterLabel.textContent = 'AI Speaking';
+  if (micMeterLabel) micMeterLabel.textContent = 'Voice active';
 
   audioPlayer.src = `data:audio/wav;base64,${base64Audio}`;
   audioPlayer.play().catch(e => console.log('Autoplay audio blocked:', e));
 
   audioPlayer.onended = () => {
-    callStage.classList.remove('speaking');
-    callStatusText.textContent = 'Connected (In Call)';
+    stageContainer.classList.remove('speaking');
+    callStatusText.textContent = 'Connected';
+    if (micMeterLabel) micMeterLabel.textContent = 'Microphone standby';
     if (isCallActive && handsFreeToggle.checked && !isMuted) {
       setTimeout(() => startListeningCycle(), 350);
     }
@@ -524,8 +591,9 @@ async function endCall() {
   audioPlayer.pause();
   clearInterval(callTimerInterval);
 
-  callStage.classList.remove('in-call', 'speaking');
-  callStatusText.textContent = 'Wrapping up call...';
+  stageContainer.classList.remove('in-call', 'speaking');
+  activeDot.classList.remove('live');
+  callStatusText.textContent = 'Saving conversation...';
 
   const durationSec = Math.floor((Date.now() - callStartTime) / 1000);
 
@@ -554,14 +622,13 @@ async function endCall() {
 function resetCallUI() {
   isCallActive = false;
   currentCallId = null;
-  startCallBtn.style.display = 'flex';
+  standbyControls.style.display = 'flex';
   activeCallControls.style.display = 'none';
   callSubOptions.style.display = 'none';
-  tapSpeakContainer.style.display = 'none';
-  micMeterContainer.style.display = 'none';
   if (inCallInputBox) inCallInputBox.style.display = 'none';
-  callTimer.style.display = 'none';
-  callStatusText.textContent = 'Ready to talk';
+  callStatusText.textContent = 'Ready to connect';
+  callTimer.textContent = '00:00';
+  activeDot.classList.remove('live');
 }
 
 function startTimer() {
@@ -574,21 +641,10 @@ function startTimer() {
   }, 1000);
 }
 
-// Show Post-Call Reflection Modal
 function showPostCallModal(analysis) {
-  modalTitle.textContent = `Call Ended with ${currentProfile.ai_friend_name || 'Shanthi'}`;
+  modalTitle.textContent = `Call with ${currentProfile.ai_friend_name || 'Shanthi'}`;
   modalSummary.textContent = `"${analysis.summary}"`;
-  
-  const moodMap = {
-    'happy': '😊',
-    'stressed': '🫂',
-    'tired': '☕',
-    'sad': '❤️',
-    'excited': '🎉',
-    'neutral': '🌿',
-    'relaxed': '🌿'
-  };
-  modalMoodEmoji.textContent = moodMap[analysis.mood?.toLowerCase()] || '🌿';
+  modalMoodEmoji.textContent = (analysis.mood || 'Reflective').toUpperCase();
 
   newMemoriesList.innerHTML = '';
   if (analysis.new_facts && analysis.new_facts.length > 0) {
@@ -605,29 +661,27 @@ function showPostCallModal(analysis) {
   postCallModal.classList.add('active');
 }
 
-// Event Listeners
+// =================== Event Listeners ===================
 function setupEventListeners() {
   if (startCallBtn) startCallBtn.addEventListener('click', startCall);
   if (endCallBtn) endCallBtn.addEventListener('click', endCall);
 
-  // Dedicated Tap to Speak Button
+  // Tap-to-Speak button
   if (tapSpeakBtn) {
     tapSpeakBtn.addEventListener('click', async () => {
       if (!isCallActive || !micRecorder) return;
 
       if (!isManualRecording) {
-        // Start manual recording
         isManualRecording = true;
         tapSpeakBtn.classList.add('recording');
-        tapSpeakText.textContent = 'Speaking... Tap When Done';
+        tapSpeakText.textContent = 'Speaking... Tap to finish';
         micRecorder.start();
-        micMeterLabel.textContent = 'Recording Voice...';
+        micMeterLabel.textContent = 'Recording speech';
       } else {
-        // Stop and send audio
         isManualRecording = false;
         tapSpeakBtn.classList.remove('recording');
-        tapSpeakText.textContent = 'Tap to Speak';
-        micMeterLabel.textContent = 'Sending to STT...';
+        tapSpeakText.textContent = 'Tap to speak';
+        micMeterLabel.textContent = 'Transcribing...';
         const wavBlob = micRecorder.stop();
         if (wavBlob && wavBlob.size > 2000) {
           processRecordedAudio(wavBlob);
@@ -666,11 +720,13 @@ function setupEventListeners() {
       stopListeningCycle();
       document.getElementById('micOnIcon').style.display = 'none';
       document.getElementById('micOffIcon').style.display = 'block';
-      callStatusText.textContent = 'Microphone Muted';
+      callStatusText.textContent = 'Microphone muted';
+      micMeterLabel.textContent = 'Muted';
     } else {
       document.getElementById('micOnIcon').style.display = 'block';
       document.getElementById('micOffIcon').style.display = 'none';
-      callStatusText.textContent = 'Connected (In Call)';
+      callStatusText.textContent = 'Connected';
+      micMeterLabel.textContent = 'Microphone active';
       if (handsFreeToggle.checked) startListeningCycle();
     }
   });
@@ -679,15 +735,14 @@ function setupEventListeners() {
     postCallModal.classList.remove('active');
   });
 
-  // Chat message send
+  // Chat tab send
   chatSendBtn.addEventListener('click', sendChatMessage);
   chatTextInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendChatMessage();
   });
 
-  // Clear chat
   clearChatBtn.addEventListener('click', async () => {
-    if (confirm('Clear conversation history?')) {
+    if (confirm('Clear message history?')) {
       await fetch('/api/reset', { method: 'POST' });
       messagesContainer.innerHTML = '';
       loadHistory();
@@ -695,7 +750,6 @@ function setupEventListeners() {
     }
   });
 
-  // Add Memory
   addMemoryBtn.addEventListener('click', async () => {
     const text = newMemoryInput.value.trim();
     if (!text) return;
@@ -708,14 +762,13 @@ function setupEventListeners() {
     loadMemories();
   });
 
-  // Persona Selection Cards
-  personaCards.forEach(card => {
-    card.addEventListener('click', async () => {
-      personaCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
+  personaOptions.forEach(opt => {
+    opt.addEventListener('click', async () => {
+      personaOptions.forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
 
-      const friendName = card.dataset.name;
-      const voice = card.dataset.voice;
+      const friendName = opt.dataset.name;
+      const voice = opt.dataset.voice;
 
       const payload = {
         user_name: userNameInput.value.trim() || 'Friend',
@@ -734,11 +787,10 @@ function setupEventListeners() {
     });
   });
 
-  // Save Persona Settings
   saveProfileBtn.addEventListener('click', async () => {
-    const activeCard = document.querySelector('.persona-card.active');
-    const friendName = activeCard ? activeCard.dataset.name : 'Shanthi';
-    const voice = activeCard ? activeCard.dataset.voice : 'roopa';
+    const activeOpt = document.querySelector('.persona-option.active');
+    const friendName = activeOpt ? activeOpt.dataset.name : 'Shanthi';
+    const voice = activeOpt ? activeOpt.dataset.voice : 'shruti';
 
     const payload = {
       user_name: userNameInput.value.trim() || 'Friend',
@@ -753,7 +805,7 @@ function setupEventListeners() {
       body: JSON.stringify(payload)
     });
 
-    alert('Profile & Persona updated successfully!');
+    alert('Preferences saved');
     await loadProfile();
   });
 }
@@ -785,13 +837,13 @@ async function sendChatMessage() {
 
 function appendMessage(sender, text, audioBase64 = null) {
   const bubble = document.createElement('div');
-  bubble.className = `message-bubble ${sender}`;
+  bubble.className = `bubble ${sender}`;
   bubble.innerHTML = `<p>${text}</p>`;
 
   if (sender === 'ai' && audioBase64) {
     const playBtn = document.createElement('button');
-    playBtn.className = 'voice-play-btn';
-    playBtn.innerHTML = `▶ Listen`;
+    playBtn.className = 'voice-replay-tag';
+    playBtn.innerHTML = `Play voice`;
     playBtn.onclick = () => {
       const a = new Audio(`data:audio/wav;base64,${audioBase64}`);
       a.play();
@@ -803,7 +855,7 @@ function appendMessage(sender, text, audioBase64 = null) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Load Memories & History Data
+// Data loaders
 async function loadMemories() {
   try {
     const res = await fetch('/api/memories');
@@ -811,18 +863,18 @@ async function loadMemories() {
 
     memoriesList.innerHTML = '';
     if (memories.length === 0) {
-      memoriesList.innerHTML = '<p class="subtitle" style="padding:10px 0;">No memories stored yet. Call or chat to create some!</p>';
+      memoriesList.innerHTML = '<p class="section-desc" style="padding: 8px 0;">No memories recorded yet.</p>';
       return;
     }
 
     memories.forEach(m => {
       const div = document.createElement('div');
-      div.className = 'memory-item';
+      div.className = 'memory-row';
       div.innerHTML = `
-        <span>📌 ${m.fact}</span>
-        <button class="delete-mem-btn" data-id="${m.id}">&times;</button>
+        <span>${m.fact}</span>
+        <button class="del-btn" data-id="${m.id}">&times;</button>
       `;
-      div.querySelector('.delete-mem-btn').addEventListener('click', async () => {
+      div.querySelector('.del-btn').addEventListener('click', async () => {
         await fetch(`/api/memories/${m.id}`, { method: 'DELETE' });
         loadMemories();
       });
@@ -845,20 +897,22 @@ async function loadHistory() {
 
     callsList.innerHTML = '';
     if (data.calls.length === 0) {
-      callsList.innerHTML = '<p class="subtitle">No previous calls logged yet.</p>';
+      callsList.innerHTML = '<p class="section-desc">No previous call logs recorded.</p>';
       return;
     }
 
     data.calls.forEach(c => {
       const div = document.createElement('div');
-      div.className = 'call-history-item';
-      const dateStr = new Date(c.start_time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      div.className = 'call-log-row';
+      const dateStr = new Date(c.start_time).toLocaleDateString(undefined, {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
       div.innerHTML = `
-        <div class="call-meta">
-          <span>${dateStr} (${c.duration_sec || 0}s)</span>
-          <span>Mood: ${c.mood || 'good'}</span>
+        <div class="call-log-meta">
+          <span>${dateStr}</span>
+          <span>${c.duration_sec || 0}s · ${c.mood || 'good'}</span>
         </div>
-        <div class="call-summary-txt">"${c.summary || 'Short friendly call'}"</div>
+        <p class="call-log-summary">"${c.summary || 'Heart-to-heart voice call'}"</p>
       `;
       callsList.appendChild(div);
     });

@@ -90,8 +90,10 @@ async def api_get_history():
 async def api_start_call():
     call_id = start_call()
     profile = get_profile()
-    friend_name = profile.get("ai_friend_name", "Nila")
-    voice = profile.get("ai_voice", "kavitha")
+    friend_name = profile.get("ai_friend_name", "Shanthi")
+    voice = profile.get("ai_voice", "shruti")
+    if friend_name.lower() in ["shanthi"] and voice in ["roopa", "kavitha"]:
+        voice = "shruti"
     lang = profile.get("preferred_language", "tanglish")
 
     # Generate persona-appropriate warm initial greeting audio
@@ -145,7 +147,10 @@ async def api_chat(req: ChatRequest):
 
     audio_b64 = None
     if req.audio_mode:
-        speaker = profile.get("ai_voice", "kavitha")
+        friend_name = profile.get("ai_friend_name", "Shanthi")
+        speaker = profile.get("ai_voice", "shruti")
+        if friend_name.lower() in ["shanthi"] and speaker in ["roopa"]:
+            speaker = "shruti"
         audio_b64 = await text_to_speech(reply_text, speaker=speaker, language_code="ta-IN")
 
     # Save AI message

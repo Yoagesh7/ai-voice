@@ -38,24 +38,25 @@ async def generate_friend_response(user_message: str, chat_history: list, memori
     # Persona Tone Tuning
     if friend_name.lower() in ["shanthi", "roopa"]:
         persona_vibe = (
-            f"You are {friend_name}, a deeply calm, mature, peaceful, and grounding confidante/elder sister on a phone call with {user_name}. "
-            "Your voice is gentle, unhurried, reassuring, and mature. You help {user_name} feel peaceful, safe, and heard. "
-            "Use soothing, caring Tamil/Tanglish phrases like 'Pathukalam da', 'Relax panniko, take a deep breath', 'Mella sollu, na kettu irukken'."
+            f"You are {friend_name}, a calm, mature, empathetic woman and close friend on a voice call with {user_name}. "
+            "You are a real woman speaking with a gentle, soothing, natural feminine voice in Tanglish and Tamil. "
+            "Never sound like a robot or a deep monotone voice. Speak with authentic emotional warmth, understanding, and care. "
+            "Use soothing, caring Tamil/Tanglish phrases naturally: 'Pathukalam da', 'Relax panniko', 'Take a deep breath', 'Sollu, na kettu irukken'."
         )
     elif friend_name.lower() in ["anand", "ratan"]:
         persona_vibe = (
-            f"You are {friend_name}, a calm, mature, wise, and grounded brother/mentor on a phone call with {user_name}. "
+            f"You are {friend_name}, a calm, mature, wise brother/friend on a voice call with {user_name}. "
             "You speak with quiet confidence, understanding, and warmth. Never rush."
         )
     elif friend_name.lower() in ["karthik", "vijay"]:
         persona_vibe = (
-            f"You are {friend_name}, an energetic, chill, loyal best buddy on a phone call with {user_name}. "
+            f"You are {friend_name}, an energetic, chill, loyal best buddy on a voice call with {user_name}. "
             "You motivate them, laugh with them, and keep spirits high."
         )
     else: # Nila
         persona_vibe = (
-            f"You are {friend_name}, an intimate, emotionally supportive, loving best friend on a real phone call with {user_name}. "
-            "You care deeply, celebrate their wins, and comfort them when down."
+            f"You are {friend_name}, an affectionate, caring, cheerful girl bestie on a real voice call with {user_name}. "
+            "You speak like a sweet, bubbly Chennai girl best friend in modern Tanglish."
         )
 
     system_prompt = f"""{persona_vibe}
@@ -118,20 +119,24 @@ async def text_to_speech(text: str, speaker: str = "kavitha", language_code: str
     clean_text = text.replace("*", "").replace("#", "").strip()
 
     # Determine pitch and pace based on persona
-    if speaker in ["roopa", "suhani"]:
-        # Calm, relaxed, mature feminine voice
-        pitch = -0.5
-        pace = 0.90
-    elif speaker in ["ratan", "anand"]:
-        # Calm, mature, grounded masculine voice
-        pitch = -0.6
-        pace = 0.92
-    elif speaker in ["gokul", "vijay"]:
-        # Casual, upbeat
+    # Keep pitch at 0.0 for natural human female timbre (never pitch-shift downward)
+    if speaker in ["shruti", "roopa"]:
+        # Calm, relaxed, clear feminine voice
         pitch = 0.0
-        pace = 1.05
-    else: # kavitha, priya
-        # Natural warm bestie
+        pace = 0.98
+    elif speaker in ["kavitha", "priya"]:
+        # Warm, affectionate female voice
+        pitch = 0.0
+        pace = 1.00
+    elif speaker in ["ratan", "anand"]:
+        # Calm, mature male voice
+        pitch = -0.2
+        pace = 0.95
+    elif speaker in ["gokul", "vijay"]:
+        # Casual, friendly male voice
+        pitch = 0.0
+        pace = 1.04
+    else:
         pitch = 0.0
         pace = 1.00
 
